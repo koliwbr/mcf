@@ -1,5 +1,29 @@
+import os
+from pathlib import Path
+import shutil
 
 def process_file(infile_path: str,outfile_path: str):
+    '''
+    Compile mcf file, compile it, and write it to file.
+
+    First draft available at https://docs.google.com/document/d/1LTOjGk4AVTAzR0z8PaZW3r4xKW2ZM5OCgNI_hK8JVeU/
+
+    > let varablename = Selector()
+    create new var named varablename. Don't produce any lines to outfile
+
+    > varablename.add(@a)
+    add @a to varablename, support all Minecraft selector
+
+    > varablename$ say example
+    run "say example" as all entity forom var 'varablename'
+
+    > varablename.remove(@e[gamemode=!creative])
+    removes from varable
+
+    > varablename.free()
+    removes all entity form varable AND remove it from memory
+
+    ''' 
     infile = open(infile_path,'r')
     outfile = open(outfile_path,'w')
 
@@ -51,9 +75,6 @@ def process_file(infile_path: str,outfile_path: str):
             if line.startswith(f'{var}$'):
                 outline = f"execute as @e[tag=mcfVar_{var}] at @s run {line.split('$',1)[1]}"
                 continue
-
-            # tag remove @e[gamemode=!creative] smplVar_ulubionyGracz
-            
         outfile.write(outline+'\n')
 
     if len(varables) > 0:
@@ -63,12 +84,28 @@ def process_file(infile_path: str,outfile_path: str):
     outfile.close()
 
 
-def normalize_line(text):
+def normalize_line(text: str):
+    """
+    Removes spaces from begining and end. Cheanes multiple spaces to single space.
+    """
     text = text.strip()
     while "  " in text:
         text = text.replace("  "," ")
     return text
 
+def process_dir(input_dirname: str,outdir:str):
+    for dir_path, _, file_list in os.walk(input_dirname):
+        for file in file_list:
+            file_base_name, file_ext = os.path.splitext(os.path.join(dir_path,file))
+            if not os.path.exists(outdir / Path(*Path(file_base_name).parts[1:-1])):
+                os.mkdir(outdir / Path(*Path(file_base_name).parts[1:-1]))
+            if file_ext != '.mcf':
+                shutil.copy2(file_base_name+file_ext,str(outdir / Path(*Path(file_base_name).parts[1:])) + file_ext)
+                continue
+            process_file(file_base_name+'.mcf',str(outdir / Path(*Path(file_base_name).parts[1:])) + '.mcfunction' )
+
+
 
 if __name__ == "__main__":
-    process_file('input.mcf','out.mcfunction')
+    # process_file('input.mcf','out.mcfunction')
+    process_dir('src','datapack')
