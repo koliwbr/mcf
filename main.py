@@ -2,9 +2,29 @@ import os
 from pathlib import Path
 import shutil
 
+class Selector:
+    '''
+    Pseudo-wirtual class to document how it works on MCF side.
+    '''
+    def add(selector):
+        '''
+        add player/entity by UUID, name or standard minecraft selector. Do NOT put selector in ", just type .add(@a[level=..5])
+        '''
+        pass
+    def remove(selector):
+        '''
+        remowe player/entity by UUID, name or standard minecraft selector. Do NOT put selector in ", just type .remove(@a[level=..5])
+        '''
+        pass
+    def free():
+        '''
+        remove all players from selector and remove it from memory
+        '''
+        pass
+
 def process_file(infile_path: str,outfile_path: str):
     '''
-    Compile mcf file, compile it, and write it to file.
+    Read mcf file, compile it, and write it to file.
 
     First draft available at https://docs.google.com/document/d/1LTOjGk4AVTAzR0z8PaZW3r4xKW2ZM5OCgNI_hK8JVeU/
 
@@ -94,6 +114,12 @@ def normalize_line(text: str):
     return text
 
 def process_dir(input_dirname: str,outdir:str):
+    '''
+    Read mcf files, compile it, and write it to files.
+    input_dirname - directory recursivly reads all files and directoris
+    outdir - copy all files, compile files, see process_file()
+    If file is NOT .mcf simply copy it to outdir
+    '''
     for dir_path, _, file_list in os.walk(input_dirname):
         for file in file_list:
             file_base_name, file_ext = os.path.splitext(os.path.join(dir_path,file))
